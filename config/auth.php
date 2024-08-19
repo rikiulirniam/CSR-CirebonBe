@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Mitra;
+use App\Models\User;
+
 return [
 
     /*
@@ -14,7 +17,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
+        'guard' => env('AUTH_GUARD', 'admin'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -36,10 +39,14 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
+        'admin' => [
+            'driver' => 'sanctum',
             'provider' => 'users',
         ],
+        'mitra' => [
+            'driver' => 'sanctum',
+            'provider' => 'mitras'
+        ]
     ],
 
     /*
@@ -62,13 +69,13 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'mitras' => [
+            'driver' => 'eloquent',
+            'model' => Mitra::class,
+        ],
     ],
 
     /*
