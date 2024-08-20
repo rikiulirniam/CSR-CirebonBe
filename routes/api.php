@@ -2,13 +2,35 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\MitraAuthController;
+use App\Http\Controllers\KegiatanController;
 use App\Http\Middleware\MitraCheck;
 use App\Http\Middleware\RoleChecker;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/admin_login', [AuthController::class, 'login']);
+
+
+
+Route::middleware('auth:sanctum')->get('/auth', function () {
+    $user = Auth::guard('admin')->user() ?? Auth::guard('mitra')->user();
+
+    if ($user) {
+        $role = Auth::guard('admin')->check() ? true : false;
+        return response()->json([
+            'message' => $role ? 'Hi Admin' : 'Hi Mitra',
+            'role' => $role
+        ]);
+    }
+
+    return response()->json([
+        'message' => 'Unauthorized',
+        'role' => null
+    ], 401);
+});
+
+
+
 
 // Admin Routes
 Route::prefix('/admin')->group(function () {
@@ -18,6 +40,9 @@ Route::prefix('/admin')->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:admin');
         Route::get('/', [AuthController::class, 'index'])->middleware('auth:admin');
+    });
+    Route::middleware('auth:admin')->group(function () {
+        Route::apiResource('/kegiatan', KegiatanController::class);
     });
 });
 

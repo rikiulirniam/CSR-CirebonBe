@@ -32,7 +32,7 @@ class MitraAuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:5',
+            'password' => 'required|min:8',
             'nama_perusahaan' => 'required',
             'nama_mitra' => 'required',
         ]);
@@ -68,7 +68,7 @@ class MitraAuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Kredensial salah',
+                'message' => 'Email atau Password tidak valid',
                 'errors' => $validator->errors()
             ], 422);
         }

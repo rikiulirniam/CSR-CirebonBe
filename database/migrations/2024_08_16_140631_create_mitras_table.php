@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->string('image')->nullable();
             $table->boolean('role');
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }
