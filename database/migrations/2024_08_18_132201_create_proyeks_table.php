@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('tanggal_akhir');
             $table->text('deskripsi')->nullable();
             $table->string('image');
+            $table->boolean("active")->default(true);
             $table->foreignId('kecamatan_id');
             $table->foreignId('sektor_id');
             $table->foreignId('program_id');

@@ -34,7 +34,7 @@ class MitraAuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
             'nama_perusahaan' => 'required',
-            'nama_mitra' => 'required',
+            'name' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -49,7 +49,7 @@ class MitraAuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'nama_perusahaan' => $request->nama_perusahaan,
-            'nama_mitra' => $request->nama_mitra,
+            'name' => $request->name,
             'role' => false
         ]);
 
@@ -79,6 +79,8 @@ class MitraAuthController extends Controller
             $mitra->token = $mitra->createToken(Str::random(100))->plainTextToken;
             return response()->json(['message' => 'Login Berhasil', 'user' => $mitra], 200);
         }
+
+        return response()->json(['message' => 'Email atau Password salah'], 401);
     }
 
     public function logout(Request $request)

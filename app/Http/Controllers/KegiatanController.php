@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
 use Illuminate\Http\Request;
+use PhpParser\Node\Stmt\Return_;
 use Validator;
 
 class KegiatanController extends Controller
@@ -64,36 +65,26 @@ class KegiatanController extends Controller
             ]);
         }
 
-        // Periksa apakah ada gambar yang diunggah
-        if ($request->hasFile('thumbnail')) {
 
 
 
-            $image = $request->file('thumbnail');
-            // Buat nama file unik
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            // Simpan gambar di folder public/images
-            $image->move(public_path('images/kegiatan/'), $imageName);
 
-            $slug = join("_", explode(' ', $request->judul)) . '_' . $imageName;
+        $slug = join("_", explode(' ', $request->judul));
 
-            $kegiatan = new Kegiatan();
-            $kegiatan->thumbnail = 'images/' . $imageName;
+        $kegiatan = new Kegiatan();
+        $kegiatan->thumbnail = 'images/kegiatan/' + $request->thumbnail;
 
 
-            $kegiatan->slug = $slug;
-            $kegiatan->judul = $request->judul;
-            $kegiatan->tags = $request->tags;
-            $kegiatan->status = $request->status;
-            $kegiatan->save();
+        $kegiatan->slug = $slug;
+        $kegiatan->judul = $request->judul;
+        $kegiatan->tags = $request->tags;
+        $kegiatan->status = $request->status;
+        $kegiatan->save();
 
-            return response()->json([
-                'message' => 'Data berhasil disimpan',
-                'kegiatan' => $kegiatan,
-            ], 200);
-        }
-
-        return response()->json(['message' => 'Tipe Gambar tidak didukung'], 400);
+        return response()->json([
+            'message' => 'Data berhasil disimpan',
+            'kegiatan' => $kegiatan,
+        ], 200);
     }
 
 
@@ -164,7 +155,7 @@ class KegiatanController extends Controller
         }
         if ($request->has('status')) {
             $kegiatan->status = $request->status;
-        }   
+        }
 
         // Simpan perubahan ke database
         $kegiatan->save();
@@ -179,8 +170,29 @@ class KegiatanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $slug)
     {
-        //
+        // Temukan kegiatan berdasarkan slug
+        $kegiatan = Kegiatan::where('slug', $slug)->first();
+
+        if (!$kegiatan) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+
+        // Dapatkan path asli dari gambar yang tersimpan
+        $imagePath = public_path($kegiatan->thumbnail);
+        $realImagePath = realpath($imagePath);
+
+        // Cek apakah path valid dan file ada
+        if ($realImagePath && file_exists($realImagePath)) {
+            unlink($realImagePath);
+        }
+
+        // Hapus entri dari database
+        $kegiatan->delete();
+
+        return response()->json([
+            'message' => 'Data berhasil dihapus' // Untuk debugging, dapat dihapus di produksi
+        ], 200);
     }
 }

@@ -8,26 +8,9 @@ use App\Http\Middleware\RoleChecker;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
+use Mockery\Undefined;
 
-
-
-
-Route::middleware('auth:sanctum')->get('/auth', function () {
-    $user = Auth::guard('admin')->user() ?? Auth::guard('mitra')->user();
-
-    if ($user) {
-        $role = Auth::guard('admin')->check() ? true : false;
-        return response()->json([
-            'message' => $role ? 'Hi Admin' : 'Hi Mitra',
-            'role' => $role
-        ]);
-    }
-
-    return response()->json([
-        'message' => 'Unauthorized',
-        'role' => null
-    ], 401);
-});
+Route::get('/auth', [AuthController::class, 'check'])->middleware('auth:sanctum');
 
 
 
@@ -59,6 +42,5 @@ Route::prefix('/mitra')->group(function () {
     });
 
 
-    // 
 
 });

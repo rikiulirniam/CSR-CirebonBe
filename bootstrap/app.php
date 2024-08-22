@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\MitraCheck;
 use App\Http\Middleware\RoleChecker;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // "mitra" = MitraCheck::class;
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

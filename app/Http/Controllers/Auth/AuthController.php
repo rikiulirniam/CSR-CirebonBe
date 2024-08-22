@@ -14,6 +14,19 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
+    public function check()
+    {
+        $user = Auth::guard('admin')->user() ?? Auth::guard('mitra')->user();
+        if ($user) {
+            $role = Auth::guard('admin')->check() ? true : false;
+            return response()->json([
+                'message' => $role ? 'Hi Admin' : 'Hi Mitra',
+                'role' => $role
+            ]);
+        }
+        return response()->json(['message' => 'Unauthorized', 'role' => null], 401);
+    }
+
     public function index()
     {
         if (Auth::check()) { // Gunakan Auth::check() tanpa parameter guard
@@ -32,30 +45,31 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|min:5', 
+            'password' => 'required|min:5',
         ]);
 
-        if ($validator->fails()) {  
+        if ($validator->fails()) {
             return response()->json([
-                'message' => 'Email atau Password tidak valid!',
+                'message' => 'Email atau Password ngga valid',
                 'errors' => $validator->errors()
             ], 422);
         }
 
         $user = User::query()->where('email', $request->email)->first();
-        
-        if($user && Hash::check($request->password, $user->password)){
+
+        if ($user && Hash::check($request->password, $user->password)) {
             $user->token = $user->createToken(Str::random(100))->plainTextToken;
             return response()->json([
                 'message' => 'Login Success',
                 'user' => $user
             ]);
-        }        
+        }
 
-        return response()->json(['message' => 'Email atau Password salah!'], 401);
+        return response()->json(['message' => 'Email atau Password salah'], 401);
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         $user = Auth::guard('admin');
         if ($user->check()) {
             $token = PersonalAccessToken::where('token', hash('sha256', explode('|', $request->bearerToken())[1]))->first();

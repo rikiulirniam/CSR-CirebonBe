@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Kecamatan;
+use App\Models\Sektor;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -68,5 +69,23 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Default Sektor
+        Sektor::insert([
+            [
+                'image' => '/images/sektor/sosial.png',
+                'judul' => 'Sosial',
+                'deskripsi' => "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Explicabo soluta voluptatem et, quia nobis nulla quasi in, vero animi ex, suscipit ad! Atque dolorum quod mollitia amet illo quibusdam voluptatibus."
+            ],
+            [
+                'image' => '/images/sektor/lingkungan.png',
+                'judul' => 'Lingkungan',
+                'deskripsi' => "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Explicabo soluta voluptatem et, quia nobis nulla quasi in, vero animi ex, suscipit ad! Atque dolorum quod mollitia amet illo quibusdam voluptatibus."
+            ],
+            [
+                'image' => '/images/sektor/kesehatan.png',
+                'judul' => 'Kesehatan',
+                'deskripsi' => "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Explicabo soluta voluptatem et, quia nobis nulla quasi in, vero animi ex, suscipit ad! Atque dolorum quod mollitia amet illo quibusdam voluptatibus."
+            ]
+
+        ]);
     }
 }
