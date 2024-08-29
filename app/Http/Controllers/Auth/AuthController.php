@@ -21,7 +21,7 @@ class AuthController extends Controller
             $role = Auth::guard('admin')->check() ? true : false;
             return response()->json([
                 'message' => $role ? 'Hi Admin' : 'Hi Mitra',
-                'role' => $role
+                'user' => $user
             ]);
         }
         return response()->json(['message' => 'Unauthorized', 'role' => null], 401);
@@ -29,7 +29,7 @@ class AuthController extends Controller
 
     public function index()
     {
-        if (Auth::check()) { // Gunakan Auth::check() tanpa parameter guard
+        if (Auth::check()) {
             return response()->json([
                 'message' => 'User showed',
                 'user' => Auth::user(),
@@ -39,7 +39,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Not Found'], 404);
     }
 
-
+    
 
     public function login(Request $request)
     {

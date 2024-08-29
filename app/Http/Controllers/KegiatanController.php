@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Kegiatan;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\Return_;
+use Storage;
+use Str;
 use Validator;
 
 class KegiatanController extends Controller
@@ -52,7 +54,7 @@ class KegiatanController extends Controller
     {
         // Validasi input dari request
         $validator = Validator::make($request->all(), [
-            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:10240',
             'judul' => 'required|min:3',
             'tags' => 'required|string',
             'status' => 'required|boolean',
@@ -65,21 +67,19 @@ class KegiatanController extends Controller
             ]);
         }
 
+        $imageName = "Kegiatan_".Str::random(32) . "." . $request->thumbnail->getClientOriginalExtension();
 
+        $kegiatan = Kegiatan::create([
+            'name' => $request->name,
+            'thumbnail' => "/images/kegiatan/" . $imageName,
+            'deskripsi' => $request->description,
+            'judul' => $request->judul,
+            'tags' => $request->tags,
+            'status' => $request->status,
+        ]);
 
-
-
-        $slug = join("_", explode(' ', $request->judul));
-
-        $kegiatan = new Kegiatan();
-        $kegiatan->thumbnail = 'images/kegiatan/' + $request->thumbnail;
-
-
-        $kegiatan->slug = $slug;
-        $kegiatan->judul = $request->judul;
-        $kegiatan->tags = $request->tags;
-        $kegiatan->status = $request->status;
-        $kegiatan->save();
+        // Save Image in Storage folder
+        Storage::disk('public')->put("images/kegiatan/{$imageName}", file_get_contents($request->thumbnail));
 
         return response()->json([
             'message' => 'Data berhasil disimpan',
@@ -91,9 +91,9 @@ class KegiatanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $slug)
+    public function show(string $id)
     {
-        $kegiatan = Kegiatan::query()->where('slug', $slug)->first();
+        $kegiatan = Kegiatan::query()->where('id', $id)->first();
 
         return response()->json(['message' => "Detail kegiatan berhasil ditampilkan", "kegiatan" => $kegiatan]);
     }
@@ -101,7 +101,7 @@ class KegiatanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $slug)
+    public function update(Request $request, $id)
     {
         // Validasi input dari request
         $validator = Validator::make($request->all(), [
@@ -111,39 +111,23 @@ class KegiatanController extends Controller
             'deskripsi' => 'nullable|string',
             'status' => 'nullable|boolean',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json([
-                'message' => "Form tidak lengkap atau tipe gambar tidak didukung",
+                'message' => "Tipe gambar tidak didukung!",
                 'errors' => $validator->errors()
             ], 422);
         }
+        
 
-        // Temukan kegiatan berdasarkan slug
-        $kegiatan = Kegiatan::where('slug', $slug)->first();
+        // Temukan kegiatan berdasarkan ID
+        $kegiatan = Kegiatan::where('id', $id)->first();
 
         if (!$kegiatan) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
 
-        // Periksa apakah ada gambar yang diunggah
-        if ($request->hasFile('thumbnail')) {
-            $image = $request->file('thumbnail');
-            // Buat nama file unik
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            // Simpan gambar di folder public/images/kegiatan/
-            $image->move(public_path('images/kegiatan/'), $imageName);
-
-            // Hapus gambar lama jika ada (opsional)
-            if ($kegiatan->thumbnail && file_exists(public_path($kegiatan->thumbnail))) {
-                unlink(public_path($kegiatan->thumbnail));
-            }
-
-            // Update path gambar
-            $kegiatan->thumbnail = 'images/kegiatan/' . $imageName;
-        }
-
-        // Update data lain
+        // Perbarui data lain
         if ($request->has('judul')) {
             $kegiatan->judul = $request->judul;
         }
@@ -157,6 +141,23 @@ class KegiatanController extends Controller
             $kegiatan->status = $request->status;
         }
 
+        // Simpan gambar jika ada
+        if ($request->hasFile('thumbnail')) {
+            $image = $request->file('thumbnail');
+            $imageName = "Kegiatan_".Str::random(32) . "." . $image->getClientOriginalExtension();
+
+            // Simpan gambar baru di folder public/images/kegiatan/
+            Storage::disk('public')->put("images/kegiatan/{$imageName}", file_get_contents($image));
+
+            // Hapus gambar lama jika ada
+            if ($kegiatan->thumbnail && Storage::disk('public')->exists(ltrim($kegiatan->thumbnail, '/'))) {
+                Storage::disk('public')->delete(ltrim($kegiatan->thumbnail, '/'));
+            }
+
+            // Update path gambar
+            $kegiatan->thumbnail = "images/kegiatan/{$imageName}";
+        }
+
         // Simpan perubahan ke database
         $kegiatan->save();
 
@@ -167,32 +168,30 @@ class KegiatanController extends Controller
     }
 
 
+
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $slug)
+    public function destroy(string $id)
     {
-        // Temukan kegiatan berdasarkan slug
-        $kegiatan = Kegiatan::where('slug', $slug)->first();
+        // Temukan kegiatan berdasarkan ID
+        $kegiatan = Kegiatan::where('id', $id)->first();
 
         if (!$kegiatan) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
 
         // Dapatkan path asli dari gambar yang tersimpan
-        $imagePath = public_path($kegiatan->thumbnail);
-        $realImagePath = realpath($imagePath);
-
-        // Cek apakah path valid dan file ada
-        if ($realImagePath && file_exists($realImagePath)) {
-            unlink($realImagePath);
+        if ($kegiatan->thumbnail && Storage::disk('public')->exists($kegiatan->thumbnail)) {
+            Storage::disk('public')->delete($kegiatan->thumbnail);
         }
 
         // Hapus entri dari database
         $kegiatan->delete();
 
         return response()->json([
-            'message' => 'Data berhasil dihapus' // Untuk debugging, dapat dihapus di produksi
+            'message' => 'Data berhasil dihapus'
         ], 200);
     }
 }

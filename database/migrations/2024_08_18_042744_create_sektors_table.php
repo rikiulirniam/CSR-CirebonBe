@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('sektors', function (Blueprint $table) {
             $table->id();
             $table->string('image');
-            $table->string('judul');
+            $table->string('name');
+            $table->boolean('status')->default(true);
             $table->text('deskripsi')->nullable();
         });
     }

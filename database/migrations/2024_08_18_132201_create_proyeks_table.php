@@ -14,15 +14,14 @@ return new class extends Migration
         Schema::create('proyeks', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->date('tanggal_awal');
+            $table->date('tanggal_awal');                                                          
             $table->date('tanggal_akhir');
             $table->text('deskripsi')->nullable();
             $table->string('image');
-            $table->boolean("active")->default(true);
+            $table->boolean("status")->default(true);
             $table->foreignId('kecamatan_id');
             $table->foreignId('sektor_id');
             $table->foreignId('program_id');
-
         });
     }
 

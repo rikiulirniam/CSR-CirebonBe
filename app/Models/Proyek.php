@@ -26,4 +26,16 @@ class Proyek extends Model
     {
         return $this->belongsTo(Sektor::class, 'sektor_id');
     }
+
+    public function laporans()
+    {
+        return $this->hasMany(Laporan::class);
+    }
+
+    public function mitras()
+    {
+        return $this->belongsToMany(Mitra::class, 'laporans', 'proyek_id', 'mitra_id')
+            ->wherePivot('status', 'diterima')
+            ->distinct();
+    }
 }

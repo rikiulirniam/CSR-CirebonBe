@@ -17,7 +17,7 @@ class Program extends Model
         return $this->belongsTo(Sektor::class);
     }
 
-    public function proyek(){
+    public function proyeks(){
         return $this->hasMany(Proyek::class);
     }
 }

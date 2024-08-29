@@ -27,7 +27,7 @@ class Mitra extends Model
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        'verification_token',
     ];
 
     /**
@@ -38,8 +38,11 @@ class Mitra extends Model
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function laporans(){
+        return $this->hasMany(Laporan::class);
     }
 }

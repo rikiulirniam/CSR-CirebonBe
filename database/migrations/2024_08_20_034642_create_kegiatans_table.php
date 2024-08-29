@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
             $table->string("thumbnail");
-            $table->string('slug')->unique();
             $table->string('judul');
             $table->string("tags");
             $table->text('deskripsi')->nullable();

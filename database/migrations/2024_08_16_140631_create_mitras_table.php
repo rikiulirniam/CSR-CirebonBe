@@ -21,8 +21,9 @@ return new class extends Migration
             $table->text('alamat')->nullable();
             $table->text('deskripsi')->nullable();
             $table->string('image')->nullable();
-            $table->boolean('role');
-            $table->boolean('is_active')->default(false);
+            $table->boolean('role')->default(false);
+            $table->string('verification_token')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
