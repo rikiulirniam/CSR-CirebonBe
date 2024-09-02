@@ -67,7 +67,7 @@ Route::prefix('/admin')->group(function () {
         Route::apiResource('/users', UserController::class)->except('show');
         Route::get('/users/Admin/{id}', [UserController::class, 'userAdmin']);
         Route::get('/users/Mitra/{id}', [UserController::class, 'userMitra']);
-        Route::put('/users/Admin/{id}', [UserController::class, 'udpateAdmin']);
+        Route::put('/users/Admin/{id}', [UserController::class, 'updateAdmin']);
         Route::put('/users/Mitra/{id}', [UserController::class, 'updateMitra']);
     });
 });
@@ -79,11 +79,11 @@ Route::prefix('/mitra')->group(function () {
     Route::prefix('/auth')->group(function () {
         Route::post('/register', [MitraAuthController::class, 'register']);
         Route::post('/login', [MitraAuthController::class, 'login']);
+        Route::post('/logout', [MitraAuthController::class, 'logout'])->middleware(MitraCheck::class);
     });
     // Route::get('/', [MitraAuthController::class, 'index'])->middleware(MitraCheck::class);
     Route::middleware(MitraCheck::class)->group(function () {
         Route::apiResource('/profile', MitraProfileController::class);
         Route::apiResource('/laporan', LaporanController::class);
-        Route::post('/logout', [MitraAuthController::class, 'logout']);
     });
 });

@@ -66,6 +66,10 @@ class ProfileController extends Controller
             $user->email = $request->email;
         }
 
+        if ($request->has('deskripsi')) {
+            $user->deskripsi = $request->deskripsi;
+        }
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = "Profile_" . Str::random(32) . "." . $image->getClientOriginalExtension();

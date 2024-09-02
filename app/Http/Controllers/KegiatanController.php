@@ -16,34 +16,24 @@ class KegiatanController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil nilai query parameter untuk pagination dan sorting
         $pStart = $request->query('pStart');
         $pEnd = $request->query('pEnd');
-        $sortByDate = $request->query('sortByDate');
 
-        // Query dasar untuk mengambil data
         $query = Kegiatan::query();
 
-        // Tambahkan logika sorting jika parameter 'sortByDate' ada
-        if ($sortByDate) {
-            if ($sortByDate === 'oldest') {
-                $query->orderBy('updated_at', 'asc');
-            } else if ($sortByDate === 'latest') {
-                $query->orderBy('updated_at', 'desc');
+        if ($pStart !== null) {
+            if ($pEnd !== null) {
+                $query->skip($pStart - 1)->take($pEnd - $pStart + 1);
+            } else {
+                $query->skip($pStart - 1)->take(PHP_INT_MAX);
             }
         }
 
-        // Tambahkan logika pagination jika parameter 'pStart' dan 'pEnd' ada
-        if ($pStart !== null && $pEnd !== null) {
-            $query->skip($pStart - 1)->take($pEnd - $pStart + 1);
-        }
-
-        // Ambil hasil query
-        $kegiatans = $query->get();
+        $kegiatan = $query->get();
 
         return response()->json([
             'message' => "Kegiatan berhasil ditampilkan",
-            'kegiatan' => $kegiatans
+            'kegiatan' => $kegiatan
         ]);
     }
 

@@ -113,7 +113,7 @@ class UserController extends Controller
             $admin = new User();
             $admin->name = $request->name;
             $admin->email = $request->email;
-            $admin->phone = $request->phone;
+            $admin->no_telepon = $request->no_telepon;
             $admin->address = $request->address;
             $admin->image = $request->image;
             $admin->role = true; // Set role sebagai admin

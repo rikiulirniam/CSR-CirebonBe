@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Kecamatan;
+use App\Models\Kegiatan;
 use App\Models\Sektor;
 use App\Models\User;
 use Database\Seeders\LaporanSeeder;
@@ -28,7 +29,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SektorSeeder::class,
             KecamatanSeeder::class,
-            LaporanSeeder::class
+            ProyekSeeder::class,
+            LaporanSeeder::class,
+            KegiatanSeeder::class
         ]);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Laporan;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Laporan;
+use App\Models\Proyek;
 
 class LaporanSeeder extends Seeder
 {
@@ -13,63 +13,33 @@ class LaporanSeeder extends Seeder
      */
     public function run(): void
     {
-        $laporans = [
-            [
-                'judul' => 'Rehabilitasi Sekolah Dasar',
-                'dana_realisasi' => 15000000,
-                'tgl_realisasi' => '2024-08-01',
-                'status' => 'diterima',
-                'tanggapan' => 'Laporan diterima dan dana telah dicairkan.',
-                'images' => json_encode(['/images/laporan/rehab_sd_1.png', '/images/laporan/rehab_sd_2.png']),
-                'kecamatan_id' => 1,
-                'proyek_id' => 1,
-                'mitra_id' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'judul' => 'Pembangunan Jembatan Desa',
-                'dana_realisasi' => 25000000,
-                'tgl_realisasi' => '2024-07-15',
-                'status' => 'revisi',
-                'tanggapan' => 'Laporan membutuhkan revisi terkait rincian pengeluaran.',
-                'images' => json_encode(['/images/laporan/jembatan_desa_1.png']),
-                'kecamatan_id' => 2,
-                'proyek_id' => 2,
-                'mitra_id' => 2,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'judul' => 'Perbaikan Saluran Irigasi',
-                'dana_realisasi' => 10000000,
-                'tgl_realisasi' => '2024-06-30',
-                'status' => 'ditolak',
-                'tanggapan' => 'Laporan ditolak karena tidak sesuai dengan rencana awal.',
-                'images' => json_encode(['/images/laporan/irigasi_1.png', '/images/laporan/irigasi_2.png']),
-                'kecamatan_id' => 3,
-                'proyek_id' => 3,
-                'mitra_id' => 3,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'judul' => 'Pengadaan Perlengkapan Kesehatan',
-                'dana_realisasi' => 5000000,
-                'tgl_realisasi' => '2024-08-20',
-                'status' => 'draf',
-                'tanggapan' => null,
-                'images' => json_encode(['/images/laporan/kesehatan_1.png']),
-                'kecamatan_id' => 4,
-                'proyek_id' => 4,
-                'mitra_id' => 4,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ];
+        // Dapatkan semua proyek yang ada
+        $proyeks = Proyek::all();
 
-        foreach ($laporans as $laporan) {
-            Laporan::create($laporan);
+        // ID Mitra yang ada, diasumsikan hanya ada satu mitra
+        $mitraId = 1;
+
+        // Status yang ingin diacak
+        $statuses = ['draf', 'diterima', 'ditolak'];
+
+        // Loop melalui setiap proyek untuk membuat beberapa laporan
+        foreach ($proyeks as $proyek) {
+            // Tentukan berapa banyak laporan yang ingin dibuat untuk proyek ini
+            $jumlahLaporan = rand(1, 5); // Bisa membuat antara 1 sampai 5 laporan untuk setiap proyek
+
+            for ($i = 0; $i < $jumlahLaporan; $i++) {
+                Laporan::create([
+                    'judul' => 'Laporan ' . ucfirst($statuses[array_rand($statuses)]) . ' untuk ' . $proyek->nama,
+                    'dana_realisasi' => rand(1000000, 10000000), // Random dana realisasi
+                    'tgl_realisasi' => now()->subDays(rand(1, 365)), // Random tanggal dalam 1 tahun terakhir
+                    'status' => $statuses[array_rand($statuses)], // Ambil status acak dari daftar
+                    'tanggapan' => rand(0, 1) ? 'Tanggapan random...' : null, // Acak apakah ada tanggapan atau tidak
+                    'images' => json_encode([]), // Kosongkan atau isi dengan array gambar
+                    'kecamatan_id' => $proyek->kecamatan_id,
+                    'proyek_id' => $proyek->id,
+                    'mitra_id' => $mitraId,
+                ]);
+            }
         }
     }
 }

@@ -49,8 +49,6 @@ class MitraProfileController extends Controller
             'email' => 'nullable|email',
             'nama_perusahaan' => 'nullable|string',
             'no_telepon' => 'nullable|string',
-            'alamat' => 'nullable|text',
-            'deskripsi' => 'nullable|text'
         ]);
 
         if ($validator->fails()) {

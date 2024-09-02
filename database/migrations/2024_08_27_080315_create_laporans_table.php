@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('laporans', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
-            $table->integer('dana_realisasi');
+            $table->bigInteger('dana_realisasi');
             $table->date('tgl_realisasi');
             $table->enum('status', ['ditolak', 'diterima', 'revisi', 'draf'])->default('draf');
             $table->text("tanggapan")->nullable();
